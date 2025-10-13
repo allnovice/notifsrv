@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from "express";
 import cors from "cors";
 import admin from "firebase-admin";
@@ -8,7 +9,9 @@ const PORT = process.env.PORT || 3002;
 app.use(cors());
 app.use(express.json());
 
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}');
+const serviceAccount =
+JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}');
+serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
 
 if (!serviceAccount.private_key) {
   console.error("FIREBASE_SERVICE_ACCOUNT not defined!");
@@ -17,7 +20,7 @@ if (!serviceAccount.private_key) {
 
 // Initialize Firebase Admin
 admin.initializeApp({
-  credential: admin.credential.cert("serviceAccount"),
+  credential: admin.credential.cert(serviceAccount),
 });
 
 const db = admin.firestore();
