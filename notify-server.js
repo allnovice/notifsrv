@@ -76,4 +76,8 @@ app.get("/notifications/:level", (req, res) => {
   res.json({ pending: pendingCache[key] || [] });
 });
 
+app.get("/", (req, res) => {
+  res.json({ status: "online" });
+});
+
 app.listen(PORT, () => console.log(`Notify server running on http://localhost:${PORT}`));
