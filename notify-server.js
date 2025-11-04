@@ -117,6 +117,7 @@ app.get("/pm-notifications/:uid", (req, res) => {
 });
 
 // ✅ Mark PMs as seen for a user (RTDB version)
+// ✅ Mark PMs as seen for a user (RTDB version)
 app.post("/pm-seen/:uid", async (req, res) => {
   try {
     const uid = req.params.uid;
@@ -134,19 +135,19 @@ app.post("/pm-seen/:uid", async (req, res) => {
 
     snapshot.forEach((child) => {
       const msg = child.val();
-      // only mark messages sent TO the current user, optionally FROM senderUid
       if (
         msg.recipientUid === uid &&
         msg.seen === false &&
         (!senderUid || msg.senderUid === senderUid)
       ) {
-        updates[`${child.key}/seen`] = true;
+        // ✅ correct path
+        updates[`messages/${child.key}/seen`] = true;
         updatedCount++;
       }
     });
 
     if (updatedCount > 0) {
-      await messagesRef.update(updates);
+      await rtdb.ref().update(updates);
     }
 
     res.json({ success: true, updated: updatedCount });
@@ -155,7 +156,6 @@ app.post("/pm-seen/:uid", async (req, res) => {
     res.status(500).json({ error: "Failed to mark seen" });
   }
 });
-
 app.get("/", (req, res) => res.json({ status: "online" }));
 
 app.listen(PORT, () => console.log(`Notify server running on http://localhost:${PORT}`));
